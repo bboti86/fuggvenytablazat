@@ -1,0 +1,1318 @@
+/* ============================================================================
+   EGYETEMI FÜGGVÉNYTÁBLÁZAT & INTERAKTÍV TANULÓ WEBAPP – DESIGN SYSTEM
+   Tantárgyak: Vezetői számvitel (VSZ) • Pénzügyi kimutatások elemzése (PKE) • Döntéstámogatás (DT)
+   ============================================================================ */
+
+:root {
+  /* Daylight Editorial Paper Palette (Default) */
+  --bg-canvas: #FAF8F5;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #F3EFEA;
+  --bg-elevated: #FFFFFF;
+  --bg-glass: rgba(250, 248, 245, 0.88);
+  --bg-formula: #F8F6F1;
+  --bg-code: #F1EFEA;
+
+  --text-primary: #16181D;
+  --text-secondary: #4A4F5C;
+  --text-muted: #767C8C;
+
+  --border-subtle: #E6E1D8;
+  --border-strong: #CFC8BC;
+
+  /* Course Semantic Accents */
+  --vsz-primary: #0D6E5B;
+  --vsz-bg: #EBF7F4;
+  --vsz-border: #B6E2D8;
+
+  --pke-primary: #1D4ED8;
+  --pke-bg: #EFF4FF;
+  --pke-border: #BFDBFE;
+
+  --dt-primary: #B45309;
+  --dt-bg: #FEF5EB;
+  --dt-border: #FCD3A7;
+
+  /* Explain Block Accents (Mi ez? / Mit számolunk? / Miért?) */
+  --exp-what-bg: #F4F7FB;
+  --exp-what-border: #3B82F6;
+  --exp-calc-bg: #F2F9F6;
+  --exp-calc-border: #10B981;
+  --exp-why-bg: #FDF8F0;
+  --exp-why-border: #D97706;
+
+  /* Status Colors */
+  --status-success: #15803D;
+  --status-success-bg: #DCFCE7;
+  --status-warn: #B45309;
+  --status-warn-bg: #FEF3C7;
+  --status-danger: #B91C1C;
+  --status-danger-bg: #FEE2E2;
+
+  /* Shadows & Radius */
+  --shadow-xs: 0 1px 2px rgba(22, 24, 29, 0.04);
+  --shadow-sm: 0 2px 8px rgba(22, 24, 29, 0.05), 0 1px 2px rgba(22, 24, 29, 0.03);
+  --shadow-md: 0 8px 24px rgba(22, 24, 29, 0.07), 0 2px 6px rgba(22, 24, 29, 0.04);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-serif: 'Newsreader', Georgia, serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+[data-theme="dark"] {
+  --bg-canvas: #0E1014;
+  --bg-surface: #161920;
+  --bg-subtle: #1D212A;
+  --bg-elevated: #1E222B;
+  --bg-glass: rgba(14, 16, 20, 0.88);
+  --bg-formula: #12151B;
+  --bg-code: #1B1F28;
+
+  --text-primary: #F1F3F7;
+  --text-secondary: #A9B0C0;
+  --text-muted: #70788B;
+
+  --border-subtle: #262B37;
+  --border-strong: #373E4F;
+
+  --vsz-primary: #34D399;
+  --vsz-bg: rgba(16, 185, 129, 0.12);
+  --vsz-border: rgba(52, 211, 153, 0.3);
+
+  --pke-primary: #60A5FA;
+  --pke-bg: rgba(59, 130, 246, 0.12);
+  --pke-border: rgba(96, 165, 250, 0.3);
+
+  --dt-primary: #FBBF24;
+  --dt-bg: rgba(245, 158, 11, 0.12);
+  --dt-border: rgba(251, 191, 36, 0.3);
+
+  --exp-what-bg: rgba(59, 130, 246, 0.08);
+  --exp-what-border: #60A5FA;
+  --exp-calc-bg: rgba(16, 185, 129, 0.08);
+  --exp-calc-border: #34D399;
+  --exp-why-bg: rgba(245, 158, 11, 0.08);
+  --exp-why-border: #FBBF24;
+
+  --status-success: #4ADE80;
+  --status-success-bg: rgba(22, 163, 74, 0.18);
+  --status-warn: #FBBF24;
+  --status-warn-bg: rgba(217, 119, 6, 0.18);
+  --status-danger: #F87171;
+  --status-danger-bg: rgba(220, 38, 38, 0.18);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 10px 28px rgba(0, 0, 0, 0.45);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--bg-canvas);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  min-height: 100vh;
+}
+
+/* ============================================================================
+   TOP NAVIGATION & HEADER
+   ============================================================================ */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.header-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0.85rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: var(--text-primary);
+  color: var(--bg-canvas);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-serif);
+  font-weight: 700;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  flex-shrink: 0;
+}
+
+.brand-text h1 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.brand-text p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Mode Switcher Tabs */
+.mode-nav {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--bg-subtle);
+  padding: 0.3rem;
+  border-radius: 10px;
+  border: 1px solid var(--border-subtle);
+  overflow-x: auto;
+}
+
+.mode-btn {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.48rem 0.85rem;
+  border-radius: 7px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  white-space: nowrap;
+  transition: all 0.16s ease;
+}
+
+.mode-btn:hover {
+  color: var(--text-primary);
+  background: rgba(128, 128, 128, 0.08);
+}
+
+.mode-btn.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.progress-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress-bar-mini {
+  width: 60px;
+  height: 6px;
+  background: var(--border-subtle);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--vsz-primary);
+  transition: width 0.3s ease;
+}
+
+.icon-btn {
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  padding: 0.45rem 0.75rem;
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.icon-btn:hover {
+  border-color: var(--border-strong);
+  color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+/* ============================================================================
+   HERO & COURSE OVERVIEW BAR
+   ============================================================================ */
+
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.course-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.9rem;
+  margin-bottom: 1.5rem;
+}
+
+.course-stat-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.45rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.course-stat-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: var(--border-strong);
+}
+
+.course-stat-card[data-course="vsz"]::before { background: var(--vsz-primary); }
+.course-stat-card[data-course="pke"]::before { background: var(--pke-primary); }
+.course-stat-card[data-course="dt"]::before { background: var(--dt-primary); }
+
+.course-stat-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.course-stat-card.active {
+  border-color: var(--text-primary);
+  box-shadow: var(--shadow-sm);
+  background: var(--bg-elevated);
+}
+
+.course-stat-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.course-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+}
+
+.course-tag.all {
+  background: var(--bg-subtle);
+  color: var(--text-secondary);
+}
+
+.course-tag.vsz {
+  background: var(--vsz-bg);
+  color: var(--vsz-primary);
+  border: 1px solid var(--vsz-border);
+}
+
+.course-tag.pke {
+  background: var(--pke-bg);
+  color: var(--pke-primary);
+  border: 1px solid var(--pke-border);
+}
+
+.course-tag.dt {
+  background: var(--dt-bg);
+  color: var(--dt-primary);
+  border: 1px solid var(--dt-border);
+}
+
+.course-stat-count {
+  font-family: var(--font-mono);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.course-stat-title {
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.course-stat-sub {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* ============================================================================
+   FILTER & SEARCH TOOLBAR (FÜGGVÉNYTÁBLÁZAT)
+   ============================================================================ */
+
+.toolbar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.search-wrap {
+  flex: 1 1 320px;
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  pointer-events: none;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.62rem 2.2rem 0.62rem 2.4rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--text-primary);
+}
+
+.toolbar-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.select-input {
+  padding: 0.58rem 0.85rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  max-width: 280px;
+}
+
+.status-filter-group {
+  display: inline-flex;
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.2rem;
+  gap: 0.2rem;
+}
+
+.status-chip {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0.38rem 0.68rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.status-chip.active {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+/* ============================================================================
+   FORMULA REFERENCE CARDS (FÜGGVÉNYTÁBLÁZAT)
+   ============================================================================ */
+
+.category-section {
+  margin-bottom: 2.25rem;
+}
+
+.category-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.category-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.01em;
+}
+
+.category-count {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.formula-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.15rem;
+}
+
+.formula-grid.compact-view {
+  grid-template-columns: repeat(auto-fill, minmax(440px, 1fr));
+}
+
+.formula-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.35rem 1.5rem;
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+}
+
+.formula-card:hover {
+  border-color: var(--border-strong);
+  box-shadow: var(--shadow-sm);
+}
+
+.formula-card.mastered {
+  border-left: 4px solid var(--status-success);
+}
+
+.formula-card.learning {
+  border-left: 4px solid var(--status-warn);
+}
+
+.card-top-bar {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.85rem;
+}
+
+.card-meta-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.formula-id-badge {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  padding: 0.18rem 0.5rem;
+  border-radius: 5px;
+}
+
+.formula-source {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.card-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.mastery-btn {
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-canvas);
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.28rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.mastery-btn:hover {
+  border-color: var(--border-strong);
+}
+
+.mastery-btn.active-learning {
+  background: var(--status-warn-bg);
+  color: var(--status-warn);
+  border-color: var(--status-warn);
+}
+
+.mastery-btn.active-mastered {
+  background: var(--status-success-bg);
+  color: var(--status-success);
+  border-color: var(--status-success);
+}
+
+.fav-btn {
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-canvas);
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  transition: all 0.15s ease;
+}
+
+.fav-btn.active {
+  color: #EAB308;
+  border-color: #EAB308;
+  background: rgba(234, 179, 8, 0.1);
+}
+
+.formula-title {
+  font-size: 1.12rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 0.9rem;
+  line-height: 1.35;
+}
+
+/* Mathematical Formula Display Box */
+.math-box {
+  background: var(--bg-formula);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1.05rem 1.25rem;
+  margin-bottom: 1rem;
+  overflow-x: auto;
+}
+
+.math-primary {
+  font-size: 1.08rem;
+  text-align: center;
+  padding: 0.25rem 0;
+}
+
+.math-alt-list {
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 0.94rem;
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+/* 3-Pillar Explanation Grid: Mi ez? / Mit számolunk? / Miért? */
+.explanation-pillars {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1rem;
+}
+
+.compact-view .explanation-pillars {
+  grid-template-columns: 1fr;
+}
+
+.pillar-box {
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid transparent;
+  font-size: 0.87rem;
+  line-height: 1.55;
+}
+
+.pillar-box.what-is {
+  background: var(--exp-what-bg);
+  border-left-color: var(--exp-what-border);
+}
+
+.pillar-box.what-calc {
+  background: var(--exp-calc-bg);
+  border-left-color: var(--exp-calc-border);
+}
+
+.pillar-box.why-how {
+  background: var(--exp-why-bg);
+  border-left-color: var(--exp-why-border);
+}
+
+.pillar-label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+}
+
+.pillar-text {
+  color: var(--text-secondary);
+}
+
+/* Variables & Benchmark Footer */
+.card-details-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 0.9rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid var(--border-subtle);
+  font-size: 0.82rem;
+}
+
+.compact-view .card-details-grid {
+  display: none;
+}
+
+.vars-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.32rem;
+}
+
+.var-item {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.var-sym {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--text-primary);
+  background: var(--bg-code);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.var-desc {
+  color: var(--text-secondary);
+}
+
+.var-unit {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.meta-side-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.benchmark-box {
+  background: var(--bg-subtle);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text-secondary);
+}
+
+.benchmark-box strong {
+  color: var(--text-primary);
+  display: block;
+  font-size: 0.73rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.15rem;
+}
+
+.excel-box {
+  background: var(--bg-code);
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  overflow-x: auto;
+}
+
+/* ============================================================================
+   MODE 2: FLASHCARDS (TANULÓKÁRTYÁK)
+   ============================================================================ */
+
+.study-panel {
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.study-controls-bar {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.9rem 1.2rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.flashcard-stage {
+  perspective: 1200px;
+  margin-bottom: 1.25rem;
+}
+
+.flashcard-3d {
+  width: 100%;
+  min-height: 410px;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+.flashcard-3d.flipped {
+  transform: rotateY(180deg);
+}
+
+.fc-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow-y: auto;
+}
+
+.fc-back {
+  transform: rotateY(180deg);
+  background: var(--bg-elevated);
+}
+
+.fc-center {
+  margin: auto 0;
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.fc-prompt-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  margin-bottom: 0.75rem;
+}
+
+.fc-question-title {
+  font-family: var(--font-serif);
+  font-size: 1.65rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  line-height: 1.3;
+}
+
+.fc-hint {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  max-width: 620px;
+  margin: 0 auto;
+}
+
+.fc-footer-tip {
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.75rem;
+}
+
+.fc-rating-bar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.rate-btn {
+  appearance: none;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  padding: 0.85rem 1rem;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.rate-btn span.sub {
+  font-size: 0.73rem;
+  font-weight: 500;
+  color: var(--text-muted);
+}
+
+.rate-btn.hard:hover {
+  border-color: var(--status-danger);
+  background: var(--status-danger-bg);
+  color: var(--status-danger);
+}
+
+.rate-btn.good:hover {
+  border-color: var(--status-warn);
+  background: var(--status-warn-bg);
+  color: var(--status-warn);
+}
+
+.rate-btn.easy:hover {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+  color: var(--status-success);
+}
+
+/* ============================================================================
+   MODE 3: KÉPLETÉPÍTŐ & PÁROSÍTÓ (ACTIVE RECALL BUILDER)
+   ============================================================================ */
+
+.matching-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 1rem;
+}
+
+.match-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.match-col-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.match-card {
+  background: var(--bg-surface);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-size: 0.9rem;
+  min-height: 68px;
+  display: flex;
+  align-items: center;
+}
+
+.match-card:hover:not(.matched) {
+  border-color: var(--border-strong);
+  background: var(--bg-subtle);
+}
+
+.match-card.selected {
+  border-color: var(--pke-primary);
+  background: var(--pke-bg);
+}
+
+.match-card.matched {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+  opacity: 0.65;
+  cursor: default;
+}
+
+.match-card.wrong {
+  border-color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+/* ============================================================================
+   MODE 4: VIZSGASZIMULÁTOR KVÍZ (QUIZ MODE)
+   ============================================================================ */
+
+.quiz-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1.25rem 0;
+}
+
+.quiz-opt-btn {
+  appearance: none;
+  width: 100%;
+  text-align: left;
+  background: var(--bg-canvas);
+  border: 1.5px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  font-family: var(--font-sans);
+  font-size: 0.92rem;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.quiz-opt-btn:hover:not(:disabled) {
+  border-color: var(--text-primary);
+  background: var(--bg-subtle);
+}
+
+.quiz-opt-letter {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: var(--bg-subtle);
+  border: 1px solid var(--border-subtle);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.quiz-opt-btn.correct {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+.quiz-opt-btn.incorrect {
+  border-color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+.quiz-feedback {
+  margin-top: 1rem;
+  padding: 1rem 1.2rem;
+  border-radius: var(--radius-sm);
+  background: var(--bg-subtle);
+  border-left: 4px solid var(--text-primary);
+  font-size: 0.88rem;
+}
+
+/* ============================================================================
+   MODE 5: GYAKORLATI EXCEL SZÁMOLÓFELADATOK (PRACTICE CALCULATOR)
+   ============================================================================ */
+
+.practice-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.problem-list-nav {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.prob-nav-btn {
+  appearance: none;
+  border: 1px solid transparent;
+  background: transparent;
+  text-align: left;
+  padding: 0.75rem 0.9rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-family: var(--font-sans);
+  transition: all 0.15s ease;
+}
+
+.prob-nav-btn:hover {
+  background: var(--bg-subtle);
+}
+
+.prob-nav-btn.active {
+  background: var(--bg-subtle);
+  border-color: var(--border-strong);
+}
+
+.prob-nav-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: 0.25rem;
+  line-height: 1.35;
+}
+
+.problem-workspace {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1.65rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.scenario-banner {
+  background: var(--bg-formula);
+  border: 1px solid var(--border-subtle);
+  border-left: 4px solid var(--pke-primary);
+  border-radius: var(--radius-sm);
+  padding: 1.1rem 1.25rem;
+  margin: 1rem 0 1.5rem;
+  font-size: 0.92rem;
+  color: var(--text-primary);
+}
+
+.calc-steps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.calc-step-row {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.calc-step-label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  flex: 1 1 280px;
+}
+
+.calc-input-group {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.calc-num-input {
+  width: 145px;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-strong);
+  border-radius: 6px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-align: right;
+}
+
+.calc-unit-badge {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  min-width: 55px;
+}
+
+.calc-step-solution {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding-top: 0.55rem;
+  border-top: 1px dashed var(--border-subtle);
+  color: var(--text-secondary);
+  display: none;
+}
+
+.calc-step-row.revealed .calc-step-solution {
+  display: block;
+}
+
+.calc-step-row.step-ok {
+  border-color: var(--status-success);
+  background: var(--status-success-bg);
+}
+
+.calc-step-row.step-err {
+  border-color: var(--status-danger);
+  background: var(--status-danger-bg);
+}
+
+/* ============================================================================
+   RESPONSIVE & PRINT STYLES
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .course-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .explanation-pillars {
+    grid-template-columns: 1fr;
+  }
+  .card-details-grid {
+    grid-template-columns: 1fr;
+  }
+  .practice-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .course-summary-grid {
+    grid-template-columns: 1fr;
+  }
+  .matching-grid {
+    grid-template-columns: 1fr;
+  }
+  .header-inner {
+    padding: 0.75rem 1rem;
+  }
+  .main-container {
+    padding: 1rem;
+  }
+}
+
+@media print {
+  .app-header,
+  .course-summary-grid,
+  .toolbar,
+  .card-actions-right,
+  #mode-flashcards,
+  #mode-matching,
+  #mode-quiz,
+  #mode-practice {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    font-size: 11pt;
+  }
+  .main-container {
+    max-width: 100%;
+    padding: 0;
+  }
+  .formula-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #CCCCCC;
+    box-shadow: none;
+    margin-bottom: 12pt;
+    padding: 10pt;
+  }
+  .explanation-pillars {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
