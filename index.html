@@ -40,9 +40,10 @@
         </div>
       </div>
 
-      <!-- 5-Mode Navigation -->
+      <!-- 6-Mode Navigation -->
       <nav class="mode-nav" aria-label="Alkalmazás módok">
         <button type="button" class="mode-btn active" data-mode="table" onclick="window.switchAppMode && window.switchAppMode('table')">📖 Függvénytáblázat</button>
+        <button type="button" class="mode-btn" data-mode="order" onclick="window.switchAppMode && window.switchAppMode('order')">📐 Műveleti sorrend</button>
         <button type="button" class="mode-btn" data-mode="flashcards" onclick="window.switchAppMode && window.switchAppMode('flashcards')">🃏 Tanulókártyák</button>
         <button type="button" class="mode-btn" data-mode="matching" onclick="window.switchAppMode && window.switchAppMode('matching')">🧩 Képletpárosító</button>
         <button type="button" class="mode-btn" data-mode="quiz" onclick="window.switchAppMode && window.switchAppMode('quiz')">📝 Vizsgakvíz</button>
@@ -164,6 +165,11 @@
         <aside class="problem-list-nav" id="practice-nav-list" aria-label="Gyakorlófeladatok listája"></aside>
         <div class="problem-workspace" id="practice-workspace"></div>
       </div>
+    </section>
+
+    <!-- =================== MODE 6: MŰVELETI SORREND LECKE =================== -->
+    <section id="mode-order" class="mode-section" style="display: none;">
+      <div class="study-panel" id="order-mount"></div>
     </section>
 
   </main>

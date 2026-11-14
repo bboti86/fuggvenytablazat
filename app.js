@@ -78,18 +78,47 @@
 
   function renderLatexToHtml(latexStr, displayMode = true) {
     if (!latexStr) return '';
-    if (window.katex) {
-      try {
-        return window.katex.renderToString(latexStr, {
-          displayMode: displayMode,
-          throwOnError: false,
-          strict: false
-        });
-      } catch (err) {
-        console.warn('KaTeX hiba:', err, latexStr);
+    // Split multi-part formulas on \qquad or ;\quad or ,\quad so each sub-equation sits on its own clean line
+    const parts = String(latexStr)
+      .split(/\\qquad|;\s*\\quad|,\s*\\quad/)
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const renderPart = (part) => {
+      if (window.katex) {
+        try {
+          const expr = displayMode ? `\\displaystyle ${part}` : part;
+          return window.katex.renderToString(expr, {
+            displayMode: false,
+            throwOnError: false,
+            strict: false
+          });
+        } catch (err) {
+          console.warn('KaTeX hiba:', err, part);
+        }
       }
+      return `<code>${escapeHtml(part)}</code>`;
+    };
+
+    if (parts.length <= 1) {
+      return `<span class="math-line">${renderPart(parts[0] || latexStr)}</span>`;
     }
-    return `<code>${escapeHtml(latexStr)}</code>`;
+    return parts.map(p => `<div class="math-line">${renderPart(p)}</div>`).join('');
+  }
+
+  function renderInlineVariablesLegend(variables) {
+    if (!variables || variables.length === 0) return '';
+    return `
+      <div class="var-legend-inline" aria-label="Jelölések és rövidítések jelentése">
+        ${variables.map(v => `
+          <span class="var-chip">
+            <span class="var-chip-sym">${escapeHtml(v.sym)}</span>
+            <span class="var-chip-desc">= ${escapeHtml(v.desc)}</span>
+            ${v.unit && v.unit !== '-' ? `<span class="var-chip-unit">[${escapeHtml(v.unit)}]</span>` : ''}
+          </span>
+        `).join('')}
+      </div>
+    `;
   }
 
   function escapeHtml(str) {
@@ -293,7 +322,7 @@
       courseGrid.classList.toggle('compact-bar', mode !== 'table');
     }
 
-    const sections = ['table', 'flashcards', 'matching', 'quiz', 'practice'];
+    const sections = ['table', 'order', 'flashcards', 'matching', 'quiz', 'practice'];
     sections.forEach(s => {
       const el = document.getElementById(`mode-${s}`);
       if (el) {
@@ -303,6 +332,7 @@
 
     try {
       if (mode === 'table') renderTableMode();
+      if (mode === 'order') renderOrderLesson();
       if (mode === 'flashcards') initFlashcards();
       if (mode === 'matching') initMatchingGame();
       if (mode === 'quiz' && quizQuestions.length === 0) initQuiz();
@@ -334,6 +364,7 @@
 
     populateCategoryDropdown();
     if (currentMode === 'table') renderTableMode();
+    if (currentMode === 'order') renderOrderLesson();
     if (currentMode === 'flashcards') initFlashcards();
     if (currentMode === 'matching') initMatchingGame();
     if (currentMode === 'quiz') initQuiz();
@@ -574,6 +605,7 @@
         <div class="math-box">
           <div class="math-primary">${primaryMath}</div>
           ${altMathHtml}
+          ${renderInlineVariablesLegend(f.variables)}
         </div>
 
         <div class="explanation-pillars">
@@ -1319,6 +1351,296 @@
 
   function formatHuNum(num) {
     return Number(num).toLocaleString('hu-HU', { maximumFractionDigits: 2 });
+  }
+
+  // ============================================================================
+  // MODE 6: MŰVELETI SORREND LECKE (ORDER OF OPERATIONS & WORKFLOWS)
+  // ============================================================================
+
+  function renderOrderLesson() {
+    const mount = document.getElementById('order-mount');
+    if (!mount) return;
+
+    const workflows = [
+      {
+        course: 'vsz',
+        courseName: 'Vezetői számvitel',
+        title: '1. Fedezeti elemzés és Nyereségküszöb számítási sorrendje',
+        steps: [
+          '1. Fajlagos fedezet: f = p − kᵥ',
+          '2. Fedezeti hányad: f% = f / p',
+          '3. Kritikus mennyiség: Q_krit = K_fix / f',
+          '4. Kritikus árbevétel: ÁB_krit = K_fix / f%',
+          '5. Biztonsági határ: BH = ÁB − ÁB_krit'
+        ],
+        tip: 'Soha ne oszd el a K_fix-et előbb p-vel, és utána vond ki a k_v-t! A nevezőben lévő (p − kᵥ) egy rejtett zárójel: előbb a kivonás, utána az osztás.'
+      },
+      {
+        course: 'vsz',
+        courseName: 'Vezetői számvitel',
+        title: '2. Termelési érték lánc (BTÉ → AMTÉ → NTÉ)',
+        steps: [
+          '1. Előállított termelési költség (Összes közvetlen + üzemi)',
+          '2. BTÉ = Eladott áruk + STK változás + Saját előállítású eszközök',
+          '3. AMTÉ = BTÉ − Anyagjellegű ráfordítások − Igénybe vett szolg.',
+          '4. NTÉ = AMTÉ − Értékcsökkenés (Amortizáció)'
+        ],
+        tip: 'Mindig fentről lefelé, egymásból építkezve számoljuk: előbb BTÉ, abból vonjuk az anyagjellegűeket (AMTÉ), majd az amortizációt (NTÉ).'
+      },
+      {
+        course: 'pke',
+        courseName: 'Pénzügyi kimutatások elemzése',
+        title: '3. Pénzciklus (Cash Conversion Cycle) és Likviditás',
+        steps: [
+          '1. Készlet forgási idő = (Átl. Készlet / ELÁBÉ) × 365',
+          '2. Vevő forgási idő = (Átl. Vevők / Árbevétel) × 365',
+          '3. Szállító forgási idő = (Átl. Szállítók / ELÁBÉ) × 365',
+          '4. Pénzciklus = Készletnap + Vevőnap − Szállítónap'
+        ],
+        tip: 'A törtvonal fölötti/alatti osztást (pl. Készlet / ELÁBÉ) végezd el előbb, vagy szorozz 365-tel — a szállítónapot mindig a VÉGÉN vonjuk ki!'
+      },
+      {
+        course: 'pke',
+        courseName: 'Pénzügyi kimutatások elemzése',
+        title: '4. FCFF (Szabad pénzáramlás) és Diszkontálás',
+        steps: [
+          '1. Adózott üzemi eredmény: EBIT × (1 − T)',
+          '2. Adópajzsos kamat vagy ÉCS visszaírás: + ÉCS',
+          '3. Beruházás és forgótőke levonása: − CapEx − ΔNWC',
+          '4. Jelenérték: FCFF / (1 + WACC)^t'
+        ],
+        tip: 'A diszkontálásnál a (1 + WACC)^t nevezőben előbb összeadjuk az (1 + WACC)-t, utána emeljük a t-edik hatványra, és legvégül osztjuk vele az FCFF-et!'
+      },
+      {
+        course: 'dt',
+        courseName: 'Döntéstámogatás',
+        title: '5. High-Low költségbontás és Value Driver Tree (EVA)',
+        steps: [
+          '1. Fajlagos változó ktg (b) = (K_max − K_min) / (Q_max − Q_min)',
+          '2. Fix költség (a) = K_max − (b × Q_max)',
+          '3. Költségfüggvény: Y = a + (b × x)',
+          '4. EVA = (ROCE − WACC) × Befektetett tőke'
+        ],
+        tip: 'High-Low-nál és EVA-nál is kötelező a zárójelezés: előbb a számláló és nevező különbségei (K_max − K_min) és (ROCE − WACC), és csak utána a szorzás/osztás!'
+      }
+    ];
+
+    const filteredWorkflows = activeCourse === 'all'
+      ? workflows
+      : workflows.filter(w => w.course === activeCourse);
+
+    const practiceExercises = [
+      {
+        id: 'ord-1',
+        title: 'Fedezeti pont zárójelezése',
+        prompt: 'Adott: K_fix = 1 200 000 Ft, egységár p = 5 000 Ft/db, fajlagos változó költség k_v = 3 000 Ft/db. Mennyi a fedezeti pont (Q_krit = K_fix / (p − k_v))?',
+        wrongWay: 'Hibás sorrend: 1 200 000 / 5 000 − 3 000 = 240 − 3 000 = −2 760 db (értelmetlen!)',
+        rightWay: 'Helyes sorrend: előbb a nevezőben (5 000 − 3 000) = 2 000 Ft/db, utána 1 200 000 / 2 000 = 600 db.',
+        answer: 600,
+        unit: 'db'
+      },
+      {
+        id: 'ord-2',
+        title: 'Hatványozás és osztás (Diszkontálás)',
+        prompt: 'Adott: CF = 121 000 Ft (2 év múlva esedékes), kamatláb r = 0,10 (10%), t = 2 év. Mennyi a jelenérték: PV = CF / (1 + r)^t ?',
+        wrongWay: 'Hibás sorrend: 121 000 / 1 + 0,10² = 121 000 + 0,01 = 121 000,01 Ft',
+        rightWay: 'Helyes sorrend: 1) Zárójel: 1 + 0,10 = 1,10; 2) Hatványozás: 1,10² = 1,21; 3) Osztás: 121 000 / 1,21 = 100 000 Ft.',
+        answer: 100000,
+        unit: 'Ft'
+      },
+      {
+        id: 'ord-3',
+        title: 'High-Low meredekség (Törtvonal = rejtett zárójel)',
+        prompt: 'Adott: K_max = 900 000 Ft (Q_max = 500 db-nál), K_min = 600 000 Ft (Q_min = 300 db-nál). Mennyi a fajlagos változó költség: b = (K_max − K_min) / (Q_max − Q_min)?',
+        wrongWay: 'Hibás Excel-képlet zárójel nélkül: =900000 - 600000 / 500 - 300 = 898 500 Ft/db!',
+        rightWay: 'Helyes sorrend: (900 000 − 600 000) = 300 000; (500 − 300) = 200; végül 300 000 / 200 = 1 500 Ft/db.',
+        answer: 1500,
+        unit: 'Ft/db'
+      },
+      {
+        id: 'ord-4',
+        title: 'EVA (Gazdasági hozzáadott érték)',
+        prompt: 'Adott: ROCE = 14% (0,14), WACC = 9% (0,09), Befektetett tőke = 20 000 eFt. Mennyi az EVA = (ROCE − WACC) × Befektetett tőke?',
+        wrongWay: 'Hibás sorrend: 0,14 − 0,09 × 20 000 = 0,14 − 1 800 = −1 799,86 eFt',
+        rightWay: 'Helyes sorrend: előbb a zárójelben (0,14 − 0,09) = 0,05 (5%), majd 0,05 × 20 000 = 1 000 eFt.',
+        answer: 1000,
+        unit: 'eFt'
+      }
+    ];
+
+    mount.innerHTML = `
+      <div class="order-section-card">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; flex-wrap:wrap; margin-bottom:0.75rem;">
+          <div>
+            <h2 class="order-section-title">📐 Műveleti Sorrend Lecke — Matematika, Excel és Számítási Láncok</h2>
+            <p class="order-section-sub" style="margin-bottom:0;">
+              A vizsgafeladatok és az Excel-képletek egyik leggyakoribb hibaforrása a rossz műveleti sorrend vagy a hiányzó zárójel. Ez a lecke lépésről lépésre rendszerezi a szabályokat.
+            </p>
+          </div>
+        </div>
+
+        <div class="order-steps-grid">
+          <div class="order-step-card">
+            <div class="order-step-num">1</div>
+            <div>
+              <strong>Zárójelek <code>(...)</code> és a Törtvonal</strong>
+              <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.25rem;">
+                Mindig a legbelső zárójellel kezdünk! <strong>Fontos:</strong> a törtvonal <em>láthatatlan zárójelet</em> tesz a számláló és a nevező köré is:
+              </p>
+              <div class="math-box" style="margin:0.5rem 0 0; padding:0.55rem 0.75rem;">
+                ${renderLatexToHtml('\\frac{A + B}{C - D} = (A + B) \\div (C - D)', true)}
+              </div>
+            </div>
+          </div>
+
+          <div class="order-step-card">
+            <div class="order-step-num">2</div>
+            <div>
+              <strong>Hatványozás és Gyökvonás <code>^</code></strong>
+              <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.25rem;">
+                Pénzügyekben (jelenérték, WACC, kamatos kamat) előbb a zárójelben lévő <code>(1 + r)</code> összeget számoljuk ki, majd hatványozunk, és csak utána szorzunk/osztunk:
+              </p>
+              <div class="math-box" style="margin:0.5rem 0 0; padding:0.55rem 0.75rem;">
+                ${renderLatexToHtml('PV = \\frac{CF}{(1 + r)^n}', true)}
+              </div>
+            </div>
+          </div>
+
+          <div class="order-step-card">
+            <div class="order-step-num">3</div>
+            <div>
+              <strong>Szorzás és Osztás <code>×</code> / <code>÷</code></strong>
+              <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.25rem;">
+                Azonos rangú műveletek: mindig <strong>balról jobbra</strong> haladva végezzük el őket, megelőzve az összeadást és a kivonást.
+              </p>
+              <div style="font-family:var(--font-mono); font-size:0.78rem; background:var(--bg-code); padding:0.45rem 0.65rem; border-radius:6px; margin-top:0.45rem;">
+                Excelben: <code>=(ÁB - ELÁBÉ) / ÁB</code>
+              </div>
+            </div>
+          </div>
+
+          <div class="order-step-card">
+            <div class="order-step-num">4</div>
+            <div>
+              <strong>Összeadás és Kivonás <code>+</code> / <code>-</code></strong>
+              <p style="font-size:0.84rem; color:var(--text-secondary); margin-top:0.25rem;">
+                Ezeket végezzük el <strong>utoljára</strong> (kivéve, ha zárójelben vagy törtvonal fölött/alatt vannak, mint pl. a <code>(p - kᵥ)</code> vagy a <code>(ROCE - WACC)</code>).
+              </p>
+              <div style="font-family:var(--font-mono); font-size:0.78rem; background:var(--bg-code); padding:0.45rem 0.65rem; border-radius:6px; margin-top:0.45rem;">
+                Pénzciklus: <code>Készletnap + Vevőnap - Szállítónap</code>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-section-card">
+        <h3 class="order-section-title">⚠️ Klasszikus Vizsga- és Excel-csapdák</h3>
+        <p class="order-section-sub">Így rontja el a legtöbb hallgató a számológépen vagy az Excelben, és így kell helyesen beírni:</p>
+
+        <div style="display:grid; gap:0.85rem;">
+          <div>
+            <strong style="font-size:0.9rem;">1. Fedezeti pont / Árrés / High-Low (Tört nevezője zárójel nélkül)</strong>
+            <div class="trap-compare-grid">
+              <div class="trap-box bad">
+                <strong>✗ Hibás:</strong> <code>=K_fix / p - k_v</code><br>
+                <span style="font-size:0.78rem;">A gép előbb elosztja K_fix-et p-vel, és abból vonja ki k_v-t!</span>
+              </div>
+              <div class="trap-box good">
+                <strong>✓ Helyes:</strong> <code>=K_fix / (p - k_v)</code><br>
+                <span style="font-size:0.78rem;">Előbb kiszámolja a fajlagos fedezetet (p − k_v), majd oszt.</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <strong style="font-size:0.9rem;">2. Pénz időértéke / Diszkontálás (Hatványozás és törtvonal)</strong>
+            <div class="trap-compare-grid">
+              <div class="trap-box bad">
+                <strong>✗ Hibás:</strong> <code>=CF / 1 + r^n</code><br>
+                <span style="font-size:0.78rem;">Előbb CF/1 = CF, majd hozzáadja r^n-t! Teljesen rossz eredmény.</span>
+              </div>
+              <div class="trap-box good">
+                <strong>✓ Helyes:</strong> <code>=CF / (1 + r)^n</code><br>
+                <span style="font-size:0.78rem;">Előbb (1+r), aztán ^n hatványozás, végül CF osztása.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="order-section-card">
+        <h3 class="order-section-title">🔗 Tantárgyi Számítási Sorrendek (${escapeHtml(getCourseShortLabel(activeCourse))})</h3>
+        <p class="order-section-sub">Milyen sorrendben épülnek egymásra a mutatók az egyes tantárgyak feladatainál?</p>
+
+        <div style="display:grid; gap:1rem;">
+          ${filteredWorkflows.map(wf => `
+            <div style="background:var(--bg-canvas); border:1px solid var(--border-subtle); border-radius:var(--radius-md); padding:1rem 1.15rem;">
+              <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.4rem; flex-wrap:wrap;">
+                <span class="course-tag ${getCourseBadgeClass(wf.course)}">${escapeHtml(wf.courseName)}</span>
+                <strong style="font-size:0.95rem;">${escapeHtml(wf.title)}</strong>
+              </div>
+              <div class="workflow-chain">
+                ${wf.steps.map((st, idx) => `
+                  <span class="workflow-node">${escapeHtml(st)}</span>
+                  ${idx < wf.steps.length - 1 ? '<span class="workflow-arrow">→</span>' : ''}
+                `).join('')}
+              </div>
+              <p style="font-size:0.82rem; color:var(--text-secondary); margin-top:0.65rem;">
+                <strong>💡 Szabály:</strong> ${escapeHtml(wf.tip)}
+              </p>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <div class="order-section-card">
+        <h3 class="order-section-title">🧮 Interaktív Műveleti Sorrend Gyakorló</h3>
+        <p class="order-section-sub">Számold ki fejben vagy számológéppel a helyes műveleti sorrendet követve, majd ellenőrizd!</p>
+
+        <div class="calc-steps-list">
+          ${practiceExercises.map((ex, idx) => `
+            <div class="calc-step-row" id="order-row-${idx}">
+              <div class="calc-step-label">
+                <strong>${idx + 1}. ${escapeHtml(ex.title)}</strong><br>
+                <span style="font-weight:400; font-size:0.85rem; color:var(--text-secondary);">${escapeHtml(ex.prompt)}</span>
+              </div>
+              <div class="calc-input-group">
+                <input type="text" class="calc-num-input" id="order-input-${idx}" placeholder="Eredmény..." autocomplete="off">
+                <span class="calc-unit-badge">${escapeHtml(ex.unit)}</span>
+                <button type="button" class="icon-btn" data-order-check="${idx}">Ellenőrzés</button>
+              </div>
+              <div class="calc-step-solution" id="order-sol-${idx}">
+                <div style="color:var(--status-success); font-weight:700;">✓ Helyes eredmény: ${formatHuNum(ex.answer)} ${escapeHtml(ex.unit)}</div>
+                <div style="margin-top:0.25rem;">${escapeHtml(ex.rightWay)}</div>
+                <div style="margin-top:0.2rem; color:var(--status-danger);">${escapeHtml(ex.wrongWay)}</div>
+              </div>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    mount.querySelectorAll('[data-order-check]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = parseInt(btn.getAttribute('data-order-check'), 10);
+        const ex = practiceExercises[idx];
+        const inp = document.getElementById(`order-input-${idx}`);
+        const row = document.getElementById(`order-row-${idx}`);
+        if (!inp || !row || !ex) return;
+
+        const raw = inp.value.trim().replace(/\s+/g, '').replace(',', '.');
+        const val = parseFloat(raw);
+        row.classList.remove('step-ok', 'step-err');
+        row.classList.add('revealed');
+
+        if (!isNaN(val) && Math.abs(val - ex.answer) <= 0.5) {
+          row.classList.add('step-ok');
+        } else {
+          row.classList.add('step-err');
+        }
+      });
+    });
   }
 
   // Run when DOM is ready

@@ -1535,12 +1535,126 @@ body {
   border-bottom: 1px solid var(--border-subtle);
 }
 
+/* ============================================================================
+   MODE 6: MŰVELETI SORREND LECKE (ORDER OF OPERATIONS)
+   ============================================================================ */
+
+.order-section-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1.4rem 1.5rem;
+  margin-bottom: 1.25rem;
+  box-shadow: var(--shadow-xs);
+}
+
+.order-section-title {
+  font-family: var(--font-serif);
+  font-size: 1.35rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  color: var(--text-primary);
+}
+
+.order-section-sub {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  margin-bottom: 1.1rem;
+}
+
+.order-steps-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.order-step-card {
+  background: var(--bg-canvas);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.1rem;
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.order-step-num {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--text-primary);
+  color: var(--bg-canvas);
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.trap-compare-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-top: 0.65rem;
+}
+
+.trap-box {
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.95rem;
+  font-size: 0.84rem;
+}
+
+.trap-box.good {
+  background: var(--status-success-bg);
+  border: 1px solid var(--status-success);
+}
+
+.trap-box.bad {
+  background: var(--status-danger-bg);
+  border: 1px solid var(--status-danger);
+}
+
+.workflow-chain {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+}
+
+.workflow-node {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.workflow-arrow {
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+@media (max-width: 720px) {
+  .order-steps-grid,
+  .trap-compare-grid {
+    grid-template-columns: 1fr;
+  }
+  .order-section-card {
+    padding: 1rem;
+  }
+}
+
 @media print {
   .app-header,
   .course-summary-grid,
   .toolbar,
   .card-actions-right,
   .pwa-modal-backdrop,
+  #mode-order,
   #mode-flashcards,
   #mode-matching,
   #mode-quiz,

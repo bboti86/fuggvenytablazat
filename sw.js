@@ -3,7 +3,7 @@
 // Teljes offline működés (képletek, magyarázatok, KaTeX matematikamotor, kvíz)
 // ============================================================================
 
-const CACHE_NAME = 'fuggvenytablazat-pwa-v3';
+const CACHE_NAME = 'fuggvenytablazat-pwa-v4';
 
 const CORE_ASSETS = [
   './',
