@@ -6,6 +6,15 @@
   <title>Függvénytáblázat &amp; Tanuló Webapp – Vezetői számvitel, Pénzügyi elemzés, Döntéstámogatás</title>
   <meta name="description" content="Interaktív egyetemi függvénytáblázat, magyarázatok (Mi ez? Mit számolunk? Miért?) és vizsgafelkészítő tanuló webapp Vezetői számvitel, Pénzügyi kimutatások elemzése és Döntéstámogatás tantárgyakhoz.">
 
+  <!-- PWA & Mobile App Meta Tags -->
+  <meta name="theme-color" id="meta-theme-color" content="#16181D">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Függvénytábla">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
   <!-- Google Fonts: Plus Jakarta Sans, Newsreader, JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -48,6 +57,7 @@
             <div class="progress-bar-fill" id="global-progress-fill" style="width: 0%;"></div>
           </div>
         </div>
+        <button type="button" class="icon-btn pwa-install-btn" id="install-pwa-btn" onclick="window.installAppPWA && window.installAppPWA()" title="Telepítés alkalmazásként (offline működéssel)">📲 Telepítés</button>
         <button type="button" class="icon-btn" id="print-btn" onclick="window.printAppTable && window.printAppTable()" title="Függvénytáblázat nyomtatása vagy mentése PDF-ként">🖨️ Nyomtatás / PDF</button>
         <button type="button" class="icon-btn" id="theme-toggle-btn" onclick="window.toggleAppTheme && window.toggleAppTheme()" title="Világos / Sötét téma váltása">🌙 Sötét</button>
       </div>
@@ -157,6 +167,41 @@
     </section>
 
   </main>
+
+  <!-- ======================= PWA INSTALL MODAL ======================= -->
+  <div id="pwa-install-modal" class="pwa-modal-backdrop" style="display: none;" onclick="if(event.target===this) this.style.display='none'">
+    <div class="pwa-modal-card" role="dialog" aria-labelledby="pwa-modal-title">
+      <div class="pwa-modal-header">
+        <div style="display:flex; align-items:center; gap:0.65rem;">
+          <img src="icons/icon.svg" alt="App ikon" width="36" height="36" style="border-radius:8px;">
+          <div>
+            <h3 id="pwa-modal-title" style="font-size:1.05rem;">Függvénytáblázat PWA Telepítése</h3>
+            <span id="pwa-offline-badge" style="font-size:0.75rem; color:var(--status-success); font-weight:600;">✓ 100% Offline működésre felkészítve</span>
+          </div>
+        </div>
+        <button type="button" class="icon-btn" onclick="document.getElementById('pwa-install-modal').style.display='none'">✕</button>
+      </div>
+      <div class="pwa-modal-body">
+        <p style="font-size:0.88rem; color:var(--text-secondary); margin-bottom:0.9rem;">
+          Az alkalmazás <strong>Progressive Web App (PWA)</strong> formátumú: internetkapcsolat nélkül (offline) is tartalmazza az összes képletet, magyarázatot, KaTeX matematikai formázást és gyakorlófeladatot.
+        </p>
+        <div class="explanation-pillars" style="grid-template-columns:1fr; gap:0.65rem; margin-bottom:0.5rem;">
+          <div class="pillar-box what-is">
+            <div class="pillar-label">💻 Asztali gép (Chrome / Edge / Brave)</div>
+            <div class="pillar-text">Kattints a címsor jobb szélén található <strong>Telepítés (⊕ / monitor ikon)</strong> gombra, vagy a böngésző menüjében a <em>„Mentés és megosztás → Oldal telepítése alkalmazásként”</em> opcióra.</div>
+          </div>
+          <div class="pillar-box what-calc">
+            <div class="pillar-label">📱 iPhone / iPad (Safari)</div>
+            <div class="pillar-text">Koppints alul a <strong>Megosztás (⬆️)</strong> gombra, majd válaszd a <strong>„Főképernyőhöz adás”</strong> (Add to Home Screen) lehetőséget.</div>
+          </div>
+          <div class="pillar-box why-how">
+            <div class="pillar-label">🤖 Android (Chrome)</div>
+            <div class="pillar-text">Koppints a jobb felső <strong>⋮ menüre</strong>, majd válaszd az <strong>„Alkalmazás telepítése”</strong> vagy <strong>„Kezdőképernyőhöz adás”</strong> opciót.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 
   <!-- Data & Application Scripts (Synchronous at bottom of body for instant interactive binding) -->
   <script src="data.js"></script>

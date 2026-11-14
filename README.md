@@ -75,9 +75,18 @@ Mivel az alkalmazás tisztán statikus HTML/CSS/JS fájlokból (`index.html`, `s
 3. Branch-ként állítsd be a `main` (vagy `master`) ágat és a `/ (root)` mappát, majd kattints a **Save** gombra.
 4. Néhány másodperc múlva a függvénytáblázat és a webapp elérhető lesz a `https://bboti86.github.io/fuggvenytablazat/` címen!
 
-### Futtatás saját gépen (Offline / Localhost)
-Bármelyik modern böngészőben közvetlenül megnyitható az `index.html`, vagy elindítható egy helyi szerverrel:
+### 📲 Telepítés Alkalmazásként (Progressive Web App – 100% Offline Működés)
+Az alkalmazás teljes értékű **PWA (Progressive Web App)** (`manifest.webmanifest`, `sw.js` Service Worker és helyileg csomagolt `vendor/katex/` matematikai motor):
+* **100% Offline működés:** Az első megnyitás után a Service Worker minden képletet, magyarázatot, gyakorlófeladatot és KaTeX betűkészletet eltárol a készüléken, így internetkapcsolat nélkül (pl. vonaton vagy vizsgaterem előtt) is teljes értékűen működik.
+* **Telepítés:** Kattints a felső fejlécben található **📲 Telepítés** gombra, vagy:
+  * **Asztali gépen (Chrome / Edge / Brave):** Kattints a címsor jobb szélén megjelenő telepítés ikonra.
+  * **iPhone / iPad (Safari):** *Megosztás (⬆️) $\to$ Főképernyőhöz adás*.
+  * **Android (Chrome):** *Menü (⋮) $\to$ Alkalmazás telepítése*.
+
+### Futtatás saját gépen (Localhost)
+Bármelyik modern böngészőben elindítható egy helyi szerverrel:
 ```bash
 python3 -m http.server 8000
 # Ezután nyisd meg: http://localhost:8000
 ```
+

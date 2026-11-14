@@ -119,6 +119,8 @@
   // INITIALIZATION & GLOBAL PROGRESS
   // ============================================================================
 
+  let deferredInstallPrompt = null;
+
   function init() {
     loadState();
     applyTheme(userState.theme);
@@ -134,11 +136,57 @@
     try { initQuiz(); } catch (e) { console.error(e); }
     try { initPracticeMode(); } catch (e) { console.error(e); }
     bindKeyboardShortcuts();
+    initPWA();
 
     // Restore mode from URL hash if present
     const hashMode = (window.location.hash || '').replace('#', '');
     if (['table', 'flashcards', 'matching', 'quiz', 'practice'].includes(hashMode)) {
       switchMode(hashMode, false);
+    }
+  }
+
+  function initPWA() {
+    // Register Service Worker for offline mode
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(err => {
+          console.warn('Service Worker regisztráció sikertelen:', err);
+        });
+      });
+    }
+
+    // Hide install button if already running as installed standalone app
+    const installBtn = document.getElementById('install-pwa-btn');
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) {
+      if (installBtn) installBtn.style.display = 'none';
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+      if (installBtn) {
+        installBtn.style.display = 'inline-flex';
+      }
+    });
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null;
+      if (installBtn) installBtn.style.display = 'none';
+    });
+  }
+
+  async function installPWA() {
+    if (deferredInstallPrompt) {
+      deferredInstallPrompt.prompt();
+      try {
+        await deferredInstallPrompt.userChoice;
+      } catch (e) {}
+      deferredInstallPrompt = null;
+      return;
+    }
+    const modal = document.getElementById('pwa-install-modal');
+    if (modal) {
+      modal.style.display = 'flex';
     }
   }
 
@@ -152,6 +200,10 @@
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
       themeBtn.innerHTML = theme === 'dark' ? '☀️ Világos' : '🌙 Sötét';
+    }
+    const metaTheme = document.getElementById('meta-theme-color');
+    if (metaTheme) {
+      metaTheme.setAttribute('content', theme === 'dark' ? '#0E1014' : '#16181D');
     }
   }
 
@@ -222,6 +274,7 @@
     };
     window.toggleAppTheme = toggleTheme;
     window.printAppTable = printTable;
+    window.installAppPWA = installPWA;
   }
 
   function switchMode(mode, shouldScroll = true) {

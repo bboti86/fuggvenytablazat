@@ -1,0 +1,63 @@
+{
+  "name": "Egyetemi Függvénytáblázat & Tanuló Webapp",
+  "short_name": "Függvénytábla",
+  "description": "Interaktív egyetemi függvénytáblázat, magyarázatok (Mi ez? Mit számolunk? Miért?) és vizsgafelkészítő tanuló webapp Vezetői számvitel, Pénzügyi kimutatások elemzése és Döntéstámogatás tantárgyakhoz.",
+  "lang": "hu",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#FAF8F5",
+  "theme_color": "#16181D",
+  "categories": ["education", "finance", "productivity"],
+  "icons": [
+    {
+      "src": "icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "📖 Függvénytáblázat",
+      "short_name": "Képletek",
+      "description": "Összes képlet és magyarázat megnyitása",
+      "url": "./#table",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "🃏 Tanulókártyák",
+      "short_name": "Kártyák",
+      "description": "3D tanulókártyák indítása",
+      "url": "./#flashcards",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "📝 Vizsgakvíz",
+      "short_name": "Kvíz",
+      "description": "Vizsgaszimulátor kvíz indítása",
+      "url": "./#quiz",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "🧮 Excel Gyakorlatok",
+      "short_name": "Számoló",
+      "description": "Szemináriumi számolófeladatok gyakorlása",
+      "url": "./#practice",
+      "icons": [{ "src": "icons/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
