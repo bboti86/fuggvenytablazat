@@ -11,9 +11,9 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <!-- KaTeX Matematikai Formázás -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+  <!-- Local Bundled KaTeX (Zero CDN latency / offline-ready) -->
+  <link rel="stylesheet" href="vendor/katex/katex.min.css">
+  <script src="vendor/katex/katex.min.js"></script>
 
   <!-- App Stylesheet -->
   <link rel="stylesheet" href="styles.css">
@@ -23,7 +23,7 @@
   <!-- ======================= STICKY TOP HEADER ======================= -->
   <header class="app-header">
     <div class="header-inner">
-      <div class="brand">
+      <div class="brand" role="button" tabindex="0" onclick="window.switchAppMode && window.switchAppMode('table')" title="Vissza a függvénytáblázathoz">
         <div class="brand-mark">∑</div>
         <div class="brand-text">
           <h1>Egyetemi Függvénytáblázat &amp; Tanuló Webapp</h1>
@@ -33,11 +33,11 @@
 
       <!-- 5-Mode Navigation -->
       <nav class="mode-nav" aria-label="Alkalmazás módok">
-        <button class="mode-btn active" data-mode="table">📖 Függvénytáblázat</button>
-        <button class="mode-btn" data-mode="flashcards">🃏 Tanulókártyák</button>
-        <button class="mode-btn" data-mode="matching">🧩 Képletpárosító</button>
-        <button class="mode-btn" data-mode="quiz">📝 Vizsgakvíz</button>
-        <button class="mode-btn" data-mode="practice">🧮 Excel Gyakorlatok</button>
+        <button type="button" class="mode-btn active" data-mode="table" onclick="window.switchAppMode && window.switchAppMode('table')">📖 Függvénytáblázat</button>
+        <button type="button" class="mode-btn" data-mode="flashcards" onclick="window.switchAppMode && window.switchAppMode('flashcards')">🃏 Tanulókártyák</button>
+        <button type="button" class="mode-btn" data-mode="matching" onclick="window.switchAppMode && window.switchAppMode('matching')">🧩 Képletpárosító</button>
+        <button type="button" class="mode-btn" data-mode="quiz" onclick="window.switchAppMode && window.switchAppMode('quiz')">📝 Vizsgakvíz</button>
+        <button type="button" class="mode-btn" data-mode="practice" onclick="window.switchAppMode && window.switchAppMode('practice')">🧮 Excel Gyakorlatok</button>
       </nav>
 
       <!-- Global Progress & Actions -->
@@ -48,8 +48,8 @@
             <div class="progress-bar-fill" id="global-progress-fill" style="width: 0%;"></div>
           </div>
         </div>
-        <button class="icon-btn" id="print-btn" title="Függvénytáblázat nyomtatása vagy mentése PDF-ként">🖨️ Nyomtatás / PDF</button>
-        <button class="icon-btn" id="theme-toggle-btn" title="Világos / Sötét téma váltása">🌙 Sötét</button>
+        <button type="button" class="icon-btn" id="print-btn" onclick="window.printAppTable && window.printAppTable()" title="Függvénytáblázat nyomtatása vagy mentése PDF-ként">🖨️ Nyomtatás / PDF</button>
+        <button type="button" class="icon-btn" id="theme-toggle-btn" onclick="window.toggleAppTheme && window.toggleAppTheme()" title="Világos / Sötét téma váltása">🌙 Sötét</button>
       </div>
     </div>
   </header>
@@ -57,47 +57,47 @@
   <!-- ======================= MAIN CONTENT AREA ======================= -->
   <main class="main-container">
 
-    <!-- Course Selector Cards (Always visible across all modes) -->
-    <section class="course-summary-grid" aria-label="Tantárgy szűrő">
-      <div class="course-stat-card active" data-course="all">
+    <!-- Course Selector Cards (Always visible across all modes, auto-compacts in study modes) -->
+    <section class="course-summary-grid" id="course-summary-grid" aria-label="Tantárgy szűrő">
+      <button type="button" class="course-stat-card active" data-course="all" onclick="window.selectAppCourse && window.selectAppCourse('all')">
         <div class="course-stat-top">
           <span class="course-tag all">Összes tantárgy</span>
           <span class="course-stat-count" id="count-all">58 képlet</span>
         </div>
         <div class="course-stat-title">Teljes Féléves Képlettár</div>
         <div class="course-stat-sub">Mindhárom tantárgy összes előadás- és gyakorlati képlete</div>
-      </div>
+      </button>
 
-      <div class="course-stat-card" data-course="vsz">
+      <button type="button" class="course-stat-card" data-course="vsz" onclick="window.selectAppCourse && window.selectAppCourse('vsz')">
         <div class="course-stat-top">
           <span class="course-tag vsz">VSZ</span>
           <span class="course-stat-count" id="count-vsz">28 képlet</span>
         </div>
         <div class="course-stat-title">Vezetői számvitel</div>
         <div class="course-stat-sub">1–9. tétel • Rugalmasság, Fedezet, Termelési érték, Kalkuláció, ABC/TDABC</div>
-      </div>
+      </button>
 
-      <div class="course-stat-card" data-course="pke">
+      <button type="button" class="course-stat-card" data-course="pke" onclick="window.selectAppCourse && window.selectAppCourse('pke')">
         <div class="course-stat-top">
           <span class="course-tag pke">PKE</span>
           <span class="course-stat-count" id="count-pke">21 képlet</span>
         </div>
         <div class="course-stat-title">Pénzügyi kimutatások elemzése</div>
         <div class="course-stat-sub">Vagyoni, Likviditási mérleg, Pénzciklus, Tőkeáttétel, DuPont, CF, Csődmodellek</div>
-      </div>
+      </button>
 
-      <div class="course-stat-card" data-course="dt">
+      <button type="button" class="course-stat-card" data-course="dt" onclick="window.selectAppCourse && window.selectAppCourse('dt')">
         <div class="course-stat-top">
           <span class="course-tag dt">DT</span>
           <span class="course-stat-count" id="count-dt">9 képlet</span>
         </div>
         <div class="course-stat-title">Döntéstámogatás</div>
         <div class="course-stat-sub">High-Low módszer, Árkalkuláció, Árérzékenység, Vízesés, EVA / Value Driver Tree</div>
-      </div>
+      </button>
     </section>
 
     <!-- =================== MODE 1: FÜGGVÉNYTÁBLÁZAT =================== -->
-    <section id="mode-table">
+    <section id="mode-table" class="mode-section">
       <div class="toolbar">
         <div class="search-wrap">
           <span class="search-icon">🔍</span>
@@ -115,17 +115,17 @@
           </select>
 
           <div class="status-filter-group" role="group" aria-label="Tanulási állapot szűrő">
-            <button class="status-chip active" data-status="all">Összes</button>
-            <button class="status-chip" data-status="fav">★ Kedvencek</button>
-            <button class="status-chip" data-status="learning">⏳ Tanulom</button>
-            <button class="status-chip" data-status="mastered">✓ Tudom</button>
+            <button type="button" class="status-chip active" data-status="all">Összes</button>
+            <button type="button" class="status-chip" data-status="fav">★ Kedvencek</button>
+            <button type="button" class="status-chip" data-status="learning">⏳ Tanulom</button>
+            <button type="button" class="status-chip" data-status="mastered">✓ Tudom</button>
           </div>
 
-          <button class="icon-btn" id="compact-toggle-btn">🗂️ Kompakt nézet</button>
+          <button type="button" class="icon-btn" id="compact-toggle-btn">🗂️ Kompakt nézet</button>
         </div>
       </div>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem; padding:0 0.25rem; font-size:0.82rem; color:var(--text-muted);">
+      <div class="table-status-bar">
         <span id="search-result-meta">Képletek betöltése...</span>
         <span>Minden képletnél: <strong>📌 Mi ez?</strong> • <strong>🧮 Mit számolunk?</strong> • <strong>💡 Miért és hogyan értelmezzük?</strong></span>
       </div>
@@ -134,22 +134,22 @@
     </section>
 
     <!-- =================== MODE 2: TANULÓKÁRTYÁK =================== -->
-    <section id="mode-flashcards" style="display: none;">
+    <section id="mode-flashcards" class="mode-section" style="display: none;">
       <div class="study-panel" id="flashcard-mount"></div>
     </section>
 
     <!-- =================== MODE 3: KÉPLETPÁROSÍTÓ =================== -->
-    <section id="mode-matching" style="display: none;">
+    <section id="mode-matching" class="mode-section" style="display: none;">
       <div id="matching-mount"></div>
     </section>
 
     <!-- =================== MODE 4: VIZSGASZIMULÁTOR KVÍZ =================== -->
-    <section id="mode-quiz" style="display: none;">
+    <section id="mode-quiz" class="mode-section" style="display: none;">
       <div class="study-panel" id="quiz-mount"></div>
     </section>
 
     <!-- =================== MODE 5: EXCEL GYAKORLATI SZÁMOLÓ =================== -->
-    <section id="mode-practice" style="display: none;">
+    <section id="mode-practice" class="mode-section" style="display: none;">
       <div class="practice-layout">
         <aside class="problem-list-nav" id="practice-nav-list" aria-label="Gyakorlófeladatok listája"></aside>
         <div class="problem-workspace" id="practice-workspace"></div>
@@ -158,8 +158,8 @@
 
   </main>
 
-  <!-- Data & Application Scripts -->
-  <script defer src="data.js"></script>
-  <script defer src="app.js"></script>
+  <!-- Data & Application Scripts (Synchronous at bottom of body for instant interactive binding) -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>

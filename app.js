@@ -128,12 +128,18 @@
     updateCourseCounts();
     updateGlobalProgressUI();
     populateCategoryDropdown();
-    renderTableMode();
-    initFlashcards();
-    initMatchingGame();
-    initQuiz();
-    initPracticeMode();
+    try { renderTableMode(); } catch (e) { console.error(e); }
+    try { initFlashcards(); } catch (e) { console.error(e); }
+    try { initMatchingGame(); } catch (e) { console.error(e); }
+    try { initQuiz(); } catch (e) { console.error(e); }
+    try { initPracticeMode(); } catch (e) { console.error(e); }
     bindKeyboardShortcuts();
+
+    // Restore mode from URL hash if present
+    const hashMode = (window.location.hash || '').replace('#', '');
+    if (['table', 'flashcards', 'matching', 'quiz', 'practice'].includes(hashMode)) {
+      switchMode(hashMode, false);
+    }
   }
 
   function applyTheme(theme) {
@@ -147,6 +153,19 @@
     if (themeBtn) {
       themeBtn.innerHTML = theme === 'dark' ? '☀️ Világos' : '🌙 Sötét';
     }
+  }
+
+  function toggleTheme() {
+    const next = userState.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    saveState();
+  }
+
+  function printTable() {
+    if (currentMode !== 'table') {
+      switchMode('table', false);
+    }
+    setTimeout(() => window.print(), 150);
   }
 
   function updateCourseCounts() {
@@ -194,38 +213,32 @@
   // ============================================================================
 
   function bindHeaderEvents() {
-    document.querySelectorAll('.mode-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const mode = btn.getAttribute('data-mode');
-        switchMode(mode);
-      });
-    });
-
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      themeBtn.addEventListener('click', () => {
-        const next = userState.theme === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        saveState();
-      });
-    }
-
-    const printBtn = document.getElementById('print-btn');
-    if (printBtn) {
-      printBtn.addEventListener('click', () => {
-        if (currentMode !== 'table') {
-          switchMode('table');
-        }
-        setTimeout(() => window.print(), 150);
-      });
-    }
+    // Expose global handlers for inline onclick attributes in index.html
+    window.switchAppMode = function (mode) {
+      switchMode(mode, true);
+    };
+    window.selectAppCourse = function (course) {
+      selectCourse(course);
+    };
+    window.toggleAppTheme = toggleTheme;
+    window.printAppTable = printTable;
   }
 
-  function switchMode(mode) {
+  function switchMode(mode, shouldScroll = true) {
+    if (!mode) return;
     currentMode = mode;
+
     document.querySelectorAll('.mode-btn').forEach(b => {
-      b.classList.toggle('active', b.getAttribute('data-mode') === mode);
+      const isMatch = b.getAttribute('data-mode') === mode;
+      b.classList.toggle('active', isMatch);
+      b.setAttribute('aria-pressed', isMatch ? 'true' : 'false');
     });
+
+    // Collapse course cards into compact single-line bar in study modes so content is immediately visible
+    const courseGrid = document.getElementById('course-summary-grid');
+    if (courseGrid) {
+      courseGrid.classList.toggle('compact-bar', mode !== 'table');
+    }
 
     const sections = ['table', 'flashcards', 'matching', 'quiz', 'practice'];
     sections.forEach(s => {
@@ -235,32 +248,51 @@
       }
     });
 
-    if (mode === 'table') renderTableMode();
-    if (mode === 'flashcards') initFlashcards();
-    if (mode === 'matching') initMatchingGame();
-    if (mode === 'quiz' && quizQuestions.length === 0) initQuiz();
-    if (mode === 'practice') renderPracticeWorkspace();
+    try {
+      if (mode === 'table') renderTableMode();
+      if (mode === 'flashcards') initFlashcards();
+      if (mode === 'matching') initMatchingGame();
+      if (mode === 'quiz' && quizQuestions.length === 0) initQuiz();
+      if (mode === 'practice') {
+        renderPracticeNav();
+        renderPracticeWorkspace();
+      }
+    } catch (err) {
+      console.error('Hiba a mód váltásakor:', err);
+    }
+
+    try {
+      history.replaceState(null, '', '#' + mode);
+    } catch (e) {}
+
+    if (shouldScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function selectCourse(c) {
+    if (!c) return;
+    activeCourse = c;
+    activeCategory = 'all';
+
+    document.querySelectorAll('.course-stat-card').forEach(el => {
+      el.classList.toggle('active', el.getAttribute('data-course') === c);
+    });
+
+    populateCategoryDropdown();
+    if (currentMode === 'table') renderTableMode();
+    if (currentMode === 'flashcards') initFlashcards();
+    if (currentMode === 'matching') initMatchingGame();
+    if (currentMode === 'quiz') initQuiz();
+    if (currentMode === 'practice') {
+      activeProblemIndex = 0;
+      renderPracticeNav();
+      renderPracticeWorkspace();
+    }
   }
 
   function bindCourseSummaryEvents() {
-    document.querySelectorAll('.course-stat-card').forEach(card => {
-      card.addEventListener('click', () => {
-        const c = card.getAttribute('data-course');
-        activeCourse = c;
-        activeCategory = 'all';
-
-        document.querySelectorAll('.course-stat-card').forEach(el => {
-          el.classList.toggle('active', el.getAttribute('data-course') === c);
-        });
-
-        populateCategoryDropdown();
-        if (currentMode === 'table') renderTableMode();
-        if (currentMode === 'flashcards') initFlashcards();
-        if (currentMode === 'matching') initMatchingGame();
-        if (currentMode === 'quiz') initQuiz();
-        if (currentMode === 'practice') renderPracticeNav();
-      });
-    });
+    // Handled via window.selectAppCourse
   }
 
   function populateCategoryDropdown() {
